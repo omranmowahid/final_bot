@@ -1,12 +1,12 @@
 from telegram.request import HTTPXRequest
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
-
+from code import BOT_TOKEN
 from commands_seeloo import start, chat, profile, message_handler, end_chat
 from main_seeloo import process_account, cancel,q0, q1, q2, q3,Q0, Q1, Q2, Q3
 
 def main():
     request = HTTPXRequest(read_timeout=10, connect_timeout=10)
-    application = Application.builder().token('7634518607:AAGpeqdnABm3nii53XHIPHUc7qNwJdn-jBE').request(request).build()
+    application = Application.builder().token(BOT_TOKEN).request(request).build()
     print(application.bot.get_me())
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('chat', chat))

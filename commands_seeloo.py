@@ -9,7 +9,7 @@ active_chats = {}
 async def start(update:Update, context:ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton('اکونت', callback_data='account')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(text='بخاطر چت کردن لینک /chat ره کلک کو\nیا بخاطر ساختن اکونت دکمه پایانی ره فشار بتی', reply_markup=reply_markup,)
+    await update.message.reply_text(text='بخاطر چت کردن لینک /chat ره کلک کو\nیا بخاطر ساختن اکونت دکمه پایانی ره فشار بتی',  reply_markup=reply_markup,)
     with open(file='db_start.txt', mode='a') as db:
         utc = datetime.utcnow()
         user_name = update.effective_user.username or 'NoUsername'

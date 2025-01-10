@@ -102,7 +102,7 @@ async def end_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id in active_chats:
         partner_id = active_chats.pop(user_id)
         active_chats.pop(partner_id, None)
-        await context.bot.send_message(chat_id=partner_id, text='مخاطب شما چت را ترک کرد. برای چت جدید /chat کلیک کنید')
+        await context.bot.send_message(chat_id=partner_id, text='مخاطب شما چت را ترک کرد. برای چت جدید /chat کلیک کنید', reply_markup=ReplyKeyboardRemove())
         await update.message.reply_text('شما جت را ترک کردید برای چت جدید /chat کلک کنید', reply_markup=ReplyKeyboardRemove())
     else:
         await update.message.reply_text('شما در هیچ چت ای نیستید برای چت جدید /chat کلیک کنید')

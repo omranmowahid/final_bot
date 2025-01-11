@@ -1,49 +1,12 @@
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, ConversationHandler
-def str_to_list(string): #give a string of province's cities and return a list of cities
-    pure_string = string.replace('\u200c','')
-    a = pure_string.split('،')
-    return [item.strip() for item in a]
-dic_province = {'کابل': ['خیرخانه', 'ارزان قیمت', 'چهلستون',  'دشت برچی', 'کارته نو','کوته سنگی','دارالمان', 'بت خاک','کلوله پشته','افشار','سیلو','گلدره', 'کلکان', 'قره باغ','بگرامی','پلچرخی','سروبی', 'ده سبز', 'خاک جبار','استالف','شار','دشت برچی', 'کارته نو', 'وزیر اکبر خان','خوشحال خان','دهبوری', 'میر بجه کوت','موسایی','فرزه', 'شکردره','چهار آسیاب','پغمان', 'هودخیل','شیوه کی'],
-                'مزار': str_to_list('بلخ، چارپولَک، چارکُنت، چَمتال، خَلَم، دولت‌آباد، دِهدادی، زاری، شورتپه، شولگره، کَشنده، کُلدار، مارمَل، مزار شریف، گذرگاهِ نور' ),
-                'هرات': str_to_list('شهر هرات، اَدرَسکن، اِنجیل، اوبه، شافلان، چِشت شریف، زنده‌جان، سبزوار، غوریان، فَرسی، کَرُخ، کُشک، کُشک کهنه، کُهسان، گُذَره، گُلران'),
-                'کندز': str_to_list('امام‌صاحب، چهاردره، خان‌آباد، دشت اَرچی، علی‌آباد، قلعهٔ ذال، کُندوز'),
-                'کندهار': str_to_list('ارغستان، ارغنداب، پَنجوائی، خاکریز، دامان، ریگستان، ژِرَی، سپین‌بولدَک، شاه‌ولی‌کوت، شورابَک، غورَک، قندهار، میانَشین، مَیوَند، نیِش'),
-                'بامیان': str_to_list('بامیان، کَهمَرد، پنجاب، سَیغان، شیبَر، وَرَس، یکاولنگ'),
-                'بدخشان': str_to_list('اَرغَنج‌خواه، اَرگو، اِشکاشِم، بهارک، تَگاب (کِشِمِ بالا)، تیشکان، جُرم، خاش، خواهان، دَرایِم، مایمَی، نِسَی، راغستان، زیباک، شِغنان، شِکی، شهدا، شهر بزرگ، فیض‌آباد، کُران و مُنجان، کِشِم، کوف‌آب، کوهستان، واخان، وَردوج، یاوان، یفتلِ پایین، یَمگان (گیروان)، فیض اباد'),
-                'بغلان': str_to_list('اندراب، بغلان جدید، بُرکه، پُلِ حصار، پُلِ خُمری، تاله و برفک، جَلگه، خِنجان، خوست و فِرِنگ، دوشی، دهانه غوری، دِه‌صلاح، فِرِنگ و غارو، گذرگاه نور، نَهرین، پل خمری'),
-                'پروان': str_to_list('بَگرام، جبل‌سراج، چاریکار، سالَنگ، سرخِ پارسا، سیدخیل، شیخ‌علی، شینواری، غوربند، کوهِ صافی، چاریکار'),
-                'پنجشیر': str_to_list('بازارک، اَنابه، بازارک، پریان، خِنج، دَره، روخه، شُتُل'),
-                'ننگرهار': str_to_list('اَچین، بَتی‌کوت، بِهسود، پَچیرواَگام، جلال‌آباد، حصارک، چَپَرهار، خوگیانی، دَربابا، درهٔ نور، ده‌بالا، رودات، سرخ‌رود، شیرزاد، شینوار، کوت، کوزکُنر، گوشته، لعل‌پور، مُهمنددره، نازیان'),
-                'غزنی': str_to_list('شهر غزنی، آب‌بند، اَجرستان، اَندَر، بهرام شهید، جاغوری، عُمری، ده‌یک، رشیدان، زنه‌خان، غزنی، قره‌باغ، گیرو، گیلان، مالستان، مُقُر، ناوَر، ناوه، واغَز، ولی‌محمد شهید خوگیانی'),
-                'کاپیسا': str_to_list('اَلِه‌سائی، تَگاب، حصهٔ اول کوهستان، حصهٔ دوم کوهستان، کوه‌بند، محمود راقی، نَجراب'),
-                'کنر': str_to_list('اسدآباد، بَرکُنر، خاص‌کُنر، دانگام، دره‌پیچ، چپه‌دره، چوکی، سرکانی، شیگل و شِلتَن، غازی‌آباد، مَرَوَره، ناری، نَرَنگ، نورگُل، وَتَه‌پور'),
-                'لوگر': str_to_list('اَزره، بَرَکی بَرَک، پُلِ عَلَم، چَرخ، خروار، خوشی، محمدآغه'),
-                'وردک': str_to_list('میدان شهر ، جلریز، جَغَتو، چکِ وردک، حصهٔ اول بهسود، دایمیرداد، سیدآباد، مرکزِ بهسود، نِرخ'),
-                'دایکندی': str_to_list('نیلی، اَشتَرَلی، خِدیر، سنگِ تخت، شهرستان، کِجران، کیتی، میرامور، نیلی'),
-                'نورستان': str_to_list('برگِ مَتال، پارون، دوآب، کامدیش، مَندول، نورگَرام، واما، وایگَل'),
-                'نیمروز': str_to_list('چَخانسور، چهاربُرجک، خاش‌رود، زَرَنج، کَنگ'),
-                'هلمند': str_to_list('بَغران، دیشو، ریگِ خان‌نشین، سَنگین، کَجَکی، گرمسیر، لشکرگاه، موسی‌قلعه، نادعلی، ناوهٔ بارکزائی، نوزاد، نهرِ سراج، واشیر'),
-                'تخار': str_to_list('تالقان، اِشکمِش، بَنگی، بهارک، تالقان، چال، چاه‌آب، خواجه بهاءالدین، خواجه غار، دَرقَد، دشتِ قلعه، روستاق، فَرخار، کلفگان، نمک‌آب، وَرسَج، هزارسَموچ، یَنگی‌قلعه'),
-                'لغمان': str_to_list('دولت‌شاه، قَرغه‌ای، علیشِنگ، علینگار، مِهترلام'),
-                'فراه': str_to_list('اناردره، بالابلوک، بَکواه، پرچمن، پُشت‌رود، خاک سفید، شیب‌کوه، فراه، قلعهٔ کاه، گلستان، لاش و جُوَین'),
-                'فاریاب': str_to_list('اَلمار، اَندخوی، بُلچراغ، پشتون‌کوت، خان چارباغ، دولت‌آباد، خواجه سبزپوش ولی، شیرین‌تَگاب، قَرغان، قَرَم‌قُل، قیصار، کوهستان، گَرزیوان، میمنه'),
-                'غور': str_to_list('پسابند، مرغاب، تولک، تیوره، دولت‌یار، دولینه، چارسده، فیروزکوه، ساغر، شهرک، لعل و سرجنگل'),
-                'سمنگان': str_to_list('آیبک، حضرتِ سلطان، خُرم و سارباغ، درهٔ صوف بالا، درهٔ صوف پایین، روی دوآب، فیروزنَخچیر'),
-                'سرپل': str_to_list('شهر سرپل، بلخاب، سرپل، سانچارک، سوزمه‌قلعه، صیاد، کوهستانات، گوسفندی'),
-                'زابل': str_to_list('قلات، اَتغَر، اَرغَنداب، تَرنگ و جَلدک، دایچوپان، شاه‌جوی، شمَلزائی، شینکَی، قَلات، کاکَر، میزان'),
-                'خوست': str_to_list('شهر خوست، باک، تَنی، تیریزائی، جاجی‌میدان، خوست مَتون، سپیره، شَمَل، صَبری (یعقوبی)، قَلَندر، گُربُز، مَندوزی، موسی‌خیل، نادرشاه‌کوت'),
-                'جوزجان': str_to_list('شبرغان، آقچه، خانقاه، خُم‌آب، خواجه دوکوه، دَرزاب، شِبِرغان، فیض‌آباد، قَرقین، قوش‌تپه، مَردیان، مِنگَجِک'),
-                'پکتیکا': str_to_list('شرن، اُرگون، اومَنه، بَرمَل، تَروُو، جانی‌خیل، دیله و خوشامند، زرغون‌شهر، زیروک، سرحوضه، سَروبی، شَرَن، گومَل، گیان، مَتاخان، نِکه، وازه‌خواه، وَرمَمی، یحیی‌خیل، یوسف‌خیل'),
-                'پکتیا': str_to_list('گردیز،احمدآباد، جاجی، جانی‌خیل، چاوک، چَمکَنی، دَند پَتان، زَدران (پشتو: ځدران)، زُرمت، سیدکَرَم، شَواک، علی‌خیل، گردیز، لجه احمدخیل'),
-                'بادغیس': str_to_list('آب‌کَمَری، جَوَند، غورماچ، قادِس، قلعهٔ نو، بالامرغاب، مُقُر'),
-                'ارزگان': str_to_list('ترین‌کوت، چوره، خاص‌ارزگان، دهراوود، شهید حساس، گیزاب')
-                }
+import json
+import pickle
 
-def arrange_keyboard_button(list):
-    keyboard = [[KeyboardButton(text=area) for area in list[i:i+5]] for i in range(0, len(list), 5)]
-    return keyboard
-list_age = [str(a) for a in range(100)]
+with open('provinces_age.json', 'r', encoding='utf-8') as data:
+    province_age = json.load(data)
+with open('cities_KeyboardButton.pkl', 'rb') as f:
+    cities_KeyboardButton = pickle.load(f)
 
 Q0, Q1, Q2, Q3 = 1,2,3,4
 
@@ -77,20 +40,22 @@ async def q0(update:Update, context:ContextTypes.DEFAULT_TYPE):
     return Q1
 
 async def q1(update:Update, context:ContextTypes.DEFAULT_TYPE):
-    if update.message.text in list_age:
+    if update.message.text in province_age[1]['list_age']:
         age = update.message.text
         context.user_data['age'] = age
     else:
         age = '18'
         context.user_data['age'] = age
-    keyboard = arrange_keyboard_button(list(dic_province.keys()))
+    keyboard = cities_KeyboardButton['province']
 
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
     await update.message.reply_text(f'ولایت خود را انتخاب کنید', reply_markup=reply_markup)
     await update.message.reply_text('👇')
     return Q2
 async def q2(update:Update, context:ContextTypes.DEFAULT_TYPE):
-    if update.message.text in list(dic_province.keys()):
+    with open('provinces_age.json', 'r', encoding='utf-8') as data:
+        province_age = json.load(data)
+    if update.message.text in list(province_age[0].keys()):
         province = update.message.text
         context.user_data['province'] = province
     else:
@@ -98,75 +63,75 @@ async def q2(update:Update, context:ContextTypes.DEFAULT_TYPE):
         context.user_data['province'] = province
 
     if province == 'کابل':
-        keyboard = arrange_keyboard_button(dic_province['کابل'])
+        keyboard = cities_KeyboardButton['کابل']
     elif province == 'مزار':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['مزار'])
+        keyboard = keyboard = cities_KeyboardButton['مزار']
     elif province == 'هرات':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['هرات'])
+        keyboard = keyboard = cities_KeyboardButton['هرات']
     elif province == 'کندز':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['کندز'])
+        keyboard = keyboard = cities_KeyboardButton['کندز']
     elif province == 'کندهار':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['کندهار'])
+        keyboard = keyboard = cities_KeyboardButton['کندهار']
     elif province == 'بامیان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['بامیان'])
+        keyboard = keyboard = cities_KeyboardButton['بامیان']
     elif province == 'بدخشان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['بدخشان'])
+        keyboard = keyboard = cities_KeyboardButton['بدخشان']
     elif province == 'بغلان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['بغلان'])
+        keyboard = keyboard = cities_KeyboardButton['بغلان']
     elif province == 'پروان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['پروان'])
+        keyboard = keyboard = cities_KeyboardButton['پروان']
     elif province == 'پنجشیر':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['پنجشیر'])
+        keyboard = keyboard = cities_KeyboardButton['پنجشیر']
     elif province == 'ننگرهار':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['ننگرهار'])
+        keyboard = keyboard = cities_KeyboardButton['ننگرهار']
     elif province == 'غزنی':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['غزنی'])
+        keyboard = keyboard = cities_KeyboardButton['غزنی']
     elif province == 'کاپیسا':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['کاپیسا'])
+        keyboard = keyboard = cities_KeyboardButton['کاپیسا']
     elif province == 'کنر':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['کنر'])
+        keyboard = keyboard = cities_KeyboardButton['کنر']
     elif province == 'لوگر':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['لوگر'])
+        keyboard = keyboard = cities_KeyboardButton['لوگر']
     elif province == 'وردک':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['وردک'])
+        keyboard = keyboard = cities_KeyboardButton['وردک']
     elif province == 'دایکندی':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['دایکندی'])
+        keyboard = keyboard = cities_KeyboardButton['دایکندی']
     elif province == 'نورستان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['نورستان'])
+        keyboard = keyboard = cities_KeyboardButton['نورستان']
     elif province == 'نیمروز':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['نیمروز'])
+        keyboard = keyboard = cities_KeyboardButton['نیمروز']
     elif province == 'هلمند':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['هلمند'])
+        keyboard = keyboard = cities_KeyboardButton['هلمند']
     elif province == 'تخار':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['تخار'])
+        keyboard = keyboard = cities_KeyboardButton['تخار']
     elif province == 'لغمان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['لغمان'])
+        keyboard = keyboard = cities_KeyboardButton['لغمان']
     elif province == 'فراه':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['فراه'])
+        keyboard = keyboard = cities_KeyboardButton['فراه']
     elif province == 'فاریاب':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['فاریاب'])
+        keyboard = keyboard = cities_KeyboardButton['فاریاب']
     elif province == 'غور':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['غور'])
+        keyboard = keyboard = cities_KeyboardButton['غور']
     elif province == 'سمنگان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['سمنگان'])
+        keyboard = keyboard = cities_KeyboardButton['سمنگان']
     elif province == 'سرپل':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['سرپل'])
+        keyboard = keyboard = cities_KeyboardButton['سرپل']
     elif province == 'زابل':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['زابل'])
+        keyboard = keyboard = cities_KeyboardButton['زابل']
     elif province == 'خوست':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['خوست'])
+        keyboard = keyboard = cities_KeyboardButton['خوست']
     elif province == 'جوزجان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['جوزجان'])
+        keyboard = keyboard = cities_KeyboardButton['جوزجان']
     elif province == 'پکتیکا':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['پکتیکا'])
+        keyboard = keyboard = cities_KeyboardButton['پکتیکا']
     elif province == 'پکتیا':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['پکتیا'])
+        keyboard = keyboard = cities_KeyboardButton['پکتیا']
     elif province == 'بادغیس':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['بادغیس'])
+        keyboard = keyboard = cities_KeyboardButton['بادغیس']
     elif province == 'ارزگان':
-        keyboard = keyboard = arrange_keyboard_button(dic_province['ارزگان'])
+        keyboard = keyboard = cities_KeyboardButton['ارزگان']
     else:
-        keyboard = keyboard = arrange_keyboard_button(dic_province['کابل'])
+        keyboard = keyboard = cities_KeyboardButton['کابل']
 
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
     await update.message.reply_text(f'شهر تان را انتخاب کنید', reply_markup=reply_markup)
@@ -175,7 +140,7 @@ async def q2(update:Update, context:ContextTypes.DEFAULT_TYPE):
 
 async def q3(update:Update, context:ContextTypes.DEFAULT_TYPE):
     print(update.message.text)
-    if any(update.message.text in locations for locations in dic_province.values()):
+    if any(update.message.text in locations for locations in province_age[0].values()):
         city = update.message.text
         context.user_data['city'] = city
     else:

@@ -49,7 +49,7 @@ async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 user_name = update.effective_user.username or 'NoUsername'
                 partner_user = await context.bot.get_chat(partner_id)
                 partner_username = partner_user.username or 'NoUsername'
-                couple.write(f'{user_id}({user_name}) is with {partner_id}({partner_username}) at {utc + timedelta(hours=4, minutes=30)}')
+                couple.write(f'{user_id}({user_name}) is with {partner_id}({partner_username}) at {utc + timedelta(hours=4, minutes=30)}\n')
         else:
             # If no suitable partner is found
             waiting_users.append(user_id)
@@ -102,7 +102,7 @@ async def end_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id in active_chats:
         partner_id = active_chats.pop(user_id)
         active_chats.pop(partner_id, None)
-        await context.bot.send_message(chat_id=partner_id, text='مخاطب شما چت را ترک کرد. برای چت جدید /chat کلیک کنید')
+        await context.bot.send_message(chat_id=partner_id, text='مخاطب شما چت را ترک کرد. برای چت جدید /chat کلیک کنید', reply_markup=ReplyKeyboardRemove())
         await update.message.reply_text('شما جت را ترک کردید برای چت جدید /chat کلک کنید', reply_markup=ReplyKeyboardRemove())
     else:
         await update.message.reply_text('شما در هیچ چت ای نیستید برای چت جدید /chat کلیک کنید')

@@ -6,7 +6,7 @@ from main_seeloo import process_account, cancel,q0, q1, q2, q3,Q0, Q1, Q2, Q3
 
 def main():
     request = HTTPXRequest(read_timeout=10, connect_timeout=10)
-    application = Application.builder().token(BOT_TOKEN).request(request).build()
+    application = Application.builder().token('7585218052:AAEuPutflQaZaH5c65mlVKDrNk7jdWqZm-4').request(request).build()
     print(application.bot.get_me())
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('chat', chat))
